@@ -1,6 +1,6 @@
 import requests
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 #get all top stories ID
 url = "https://hacker-news.firebaseio.com/v0/topstories.json"
@@ -8,14 +8,16 @@ reponse = requests.get(url)
 story_id = reponse.json()
 
 current_date = datetime.now().strftime("%Y-%m-%d")
+yesterday_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
 
 #write into csv ('with' auto closes file)
 with open("data/top_stories_" + current_date + ".csv", "w", newline="") as file:
     writer = csv.writer(file)
-    writer.writerow(["Rank", "Title", "Author", "Score"])
+    writer.writerow(["Rank", "Story Id", "Title", "Author", "Score"])
 
     #grab the storyIDs
-    for i in range(5):
+    for i in range(50):
         current_story_id = story_id[i]
 
         #find first story info
@@ -27,7 +29,7 @@ with open("data/top_stories_" + current_date + ".csv", "w", newline="") as file:
         author = story_data["by"]
         score = story_data["score"]
 
-        writer.writerow([rank, title, author, score])
+        writer.writerow([rank, current_story_id, title, author, score])
 
 
         #print
