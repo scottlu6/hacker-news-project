@@ -17,7 +17,7 @@ with open("data/top_stories_" + yesterday_date +".csv", "r") as yesterday_file:
     next(reader) #skip first row
 
     for row in reader:
-        storyID = row[1] 
+        storyID =int(row[1])
         rank = int(row[0])
 
         yesterday_data[storyID] = rank
@@ -29,7 +29,7 @@ with open("data/top_stories_" + yesterday_date +".csv", "r") as yesterday_file:
     
 with open("data/top_stories_" + current_date + ".csv", "w", newline="") as file:
     writer = csv.writer(file)
-    writer.writerow(["Rank", "Story Id", "Title", "Author", "Score"])
+    writer.writerow(["Rank", "Story Id", "Title", "Author", "Score", "Rank update"])
 
     #grab the storyIDs
     for i in range(50):
@@ -44,11 +44,16 @@ with open("data/top_stories_" + current_date + ".csv", "w", newline="") as file:
         author = story_data["by"]
         score = story_data["score"]
 
-        writer.writerow([rank, current_story_id, title, author, score])
+        ##compare to yesterday
+        if current_story_id in yesterday_data:
+            yesterday_rank = yesterday_data[current_story_id]
+            rank_update = yesterday_rank - rank
 
+        else:
+            rank_update = "New!"
 
-        #print
-        print(i+1,f"------------------------")
-        print(f"Top story is: ", title)
-        print(f"Author: ", author)
-        print(f"Points: ", score)
+        writer.writerow([rank, current_story_id, title, author, score, rank_update])
+
+        
+
+        
