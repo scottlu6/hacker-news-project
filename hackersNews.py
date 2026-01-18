@@ -47,12 +47,16 @@ with open("data/top_stories_" + current_date + ".csv", "w", newline="") as file:
         ##compare to yesterday
         if current_story_id in yesterday_data:
             yesterday_rank = yesterday_data[current_story_id]
-            rank_update = yesterday_rank - rank
+            rank_delta = yesterday_rank - rank     #delta is change in math
 
+            if rank_delta > 0:
+                rank_delta = f"↑{rank_delta}"
+            else:
+                rank_delta = f"↓{abs(rank_delta)}"
         else:
-            rank_update = "New!"
+            rank_delta = "New!"
 
-        writer.writerow([rank, current_story_id, title, author, score, rank_update])
+        writer.writerow([rank, current_story_id, title, author, score, rank_delta])
 
         
 
