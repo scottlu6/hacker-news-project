@@ -7,12 +7,15 @@ url = "https://hacker-news.firebaseio.com/v0/topstories.json"
 response = requests.get(url)
 story_id = response.json()
 
+#grab dates
 current_date = datetime.now().strftime("%Y-%m-%d")
 yesterday_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
+#make dict(hashmap) for o(1) lookup
 yesterday_data = {}
 
-with open("data/top_stories_" + yesterday_date +".csv", "r") as yesterday_file:
+#add yesterdays data in dict
+with open("data/snapshots/top_stories_" + yesterday_date +".csv", "r") as yesterday_file:
     reader = csv.reader(yesterday_file)
     next(reader) #skip first row
 
@@ -22,12 +25,9 @@ with open("data/top_stories_" + yesterday_date +".csv", "r") as yesterday_file:
 
         yesterday_data[storyID] = rank
     
-    
-    
-    #write into csv ('with' auto closes file)
-    
-    
-with open("data/top_stories_" + current_date + ".csv", "w", newline="") as file:
+
+#add or update ranks
+with open("data/snapshots/top_stories_" + current_date + ".csv", "w", newline="") as file:
     writer = csv.writer(file)
     writer.writerow(["Rank", "Story Id", "Title", "Author", "Score", "Rank update"])
 
