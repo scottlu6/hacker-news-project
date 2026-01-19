@@ -28,35 +28,40 @@ with open("data/snapshots/top_stories_" + yesterday_date +".csv", "r") as yester
 
 #add or update ranks
 with open("data/snapshots/top_stories_" + current_date + ".csv", "w", newline="") as file:
-    writer = csv.writer(file)
-    writer.writerow(["Rank", "Story Id", "Title", "Author", "Score", "Rank update"])
+    snapshots = csv.writer(file)
+    snapshots.writerow(["Rank", "Story Id", "Title", "Author", "Score", "Rank update"])
 
-    #grab the storyIDs
-    for i in range(50):
-        current_story_id = story_id[i]
+    #add to history log
+    with open("data/hn_history.csv", "a", newline="") as history_file:
+        history_writer = csv.writer(history_file)
 
-        #find first story info
-        item_url = f"https://hacker-news.firebaseio.com/v0/item/{current_story_id}.json"
-        story_data = requests.get(item_url).json() 
-        
-        rank = i+1
-        title = story_data["title"]
-        author = story_data["by"]
-        score = story_data["score"]
+        #grab the storyIDs
+        for i in range(50):
+            current_story_id = story_id[i]
 
-        ##compare to yesterday
-        if current_story_id in yesterday_data:
-            yesterday_rank = yesterday_data[current_story_id]
-            rank_delta = yesterday_rank - rank     #delta is change in math
+            #find first story info
+            item_url = f"https://hacker-news.firebaseio.com/v0/item/{current_story_id}.json"
+            story_data = requests.get(item_url).json() 
+            
+            rank = i+1
+            title = story_data["title"]
+            author = story_data["by"]
+            score = story_data["score"]
 
-            if rank_delta > 0:
-                rank_delta = f"↑{rank_delta}"
+            ##compare to yesterday
+            if current_story_id in yesterday_data:
+                yesterday_rank = yesterday_data[current_story_id]
+                rank_delta = yesterday_rank - rank     #delta is change in math
+
+                if rank_delta > 0:
+                    rank_delta = f"↑{rank_delta}"
+                else:
+                    rank_delta = f"↓{abs(rank_delta)}"
             else:
-                rank_delta = f"↓{abs(rank_delta)}"
-        else:
-            rank_delta = "New!"
+                rank_delta = "New!"
 
-        writer.writerow([rank, current_story_id, title, author, score, rank_delta])
+            snapshots.writerow([rank, current_story_id, title, author, score, rank_delta])
+            history_writer.writerow([current_date, current_story_id, rank, score, rank_delta])
 
         
 
