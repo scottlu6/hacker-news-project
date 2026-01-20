@@ -26,10 +26,11 @@ with open("data/snapshots/top_stories_" + yesterday_date +".csv", "r") as yester
         yesterday_data[storyID] = rank
     
 
-#add or update ranks
+#add and update ranks
 with open("data/snapshots/top_stories_" + current_date + ".csv", "w", newline="") as file:
+
     snapshots = csv.writer(file)
-    snapshots.writerow(["Rank", "Story Id", "Title", "Author", "Score", "Rank update"])
+    snapshots.writerow(["Rank", "Story Id", "Title", "Author", "Score", "Rank update", "total_score"])
 
     #add to history log
     with open("data/hn_history.csv", "a", newline="") as history_file:
@@ -63,6 +64,34 @@ with open("data/snapshots/top_stories_" + current_date + ".csv", "w", newline=""
             snapshots.writerow([rank, current_story_id, title, author, score, rank_delta])
             history_writer.writerow([current_date, current_story_id, rank, score, rank_delta])
 
-        
+
+history_data = {}
+with open("data/hn_history.csv", "r") as history_file:
+    reader = csv.reader(history_file)
+
+    for row in reader:
+        if row[0] == current_date:
+            continue
+
+        storyID = int(row[1])
+        rank = int(row[2])
+        score = 50-rank
 
         
+        if storyID in history_data:
+            history_data[storyID] = history_data[storyID] + score
+        else:
+            history_data[storyID] = score
+    
+    
+    #sort greatest to least, [(id, total_score), (id,ts), (id,ts)...]
+    sorted_data = sorted(history_data.items(), key=lambda x: x[1], reverse=True)
+
+    print("Top 10 Stories of all time by weighted lifespan")
+
+    for x in range(10):
+        story_id, total_score = sorted_data[x]
+        print(f"{x+1} - {story_id} with the score of: {total_score}")
+        
+#clean codes now
+    
