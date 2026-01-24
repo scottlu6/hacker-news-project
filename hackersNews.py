@@ -94,4 +94,6 @@ with open("data/hn_history.csv", "r") as history_file:
         print(f"{x+1} - {story_id} with the score of: {total_score}")
         
 #clean codes now
-##add story titles
+##add story, fixing issue if yestersterdays file doesnt save
+        
+
